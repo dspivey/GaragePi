@@ -79,11 +79,11 @@ function pollCamera() {
         success: function (response, status) {
             $("#cam-img").attr("src", "img/camera.jpg" + "?" + new Date().getTime());
 
-            setTimeout('pollCamera()', 5000);
+            setTimeout('pollCamera()', 15000);
         },
         // handle error
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            setTimeout('pollCamera()', 5000);
+            setTimeout('pollCamera()', 15000);
         }
     });
 }
