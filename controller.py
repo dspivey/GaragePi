@@ -349,6 +349,12 @@ class UpdateHandler(Resource):
 
 
 class CameraHandler(Resource):
+    isLeaf = True
+
+    def __init__(self, controller):
+        Resource.__init__(self)
+        self.controller = controller
+
     def render(self, request):
         # set the request content type
         request.setHeader('Content-Type', 'application/json')
