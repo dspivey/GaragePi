@@ -117,7 +117,7 @@ class Controller:
         # camera configuration
         self.refresh_time = config['camera']['refresh_time_seconds']
         self.file_name = config['camera']['file_name']
-        syslog.syslog("Refresh Time:" + self.refresh_time)
+        syslog.syslog("Refresh Time:" + str(self.refresh_time))
         syslog.syslog("File Name:" + self.file_name)
         self.camera = Camera(self.refresh_time, self.file_name)
         self.camera.start()
