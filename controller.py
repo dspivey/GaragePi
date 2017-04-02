@@ -364,11 +364,14 @@ class Camera:
     def start(self):
         self.active = True
         while self.active:
+            syslog.syslog("Refresh Time:" + str(self.refresh_time_seconds))
+            syslog.syslog("File Name:" + self.file_name)
             self.camera.capture(self.file_name)
             sleep(self.refresh_time_seconds)
 
     def stop(self):
         self.active = False
+
 
 def elapsed_time(seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=' '):
     """
