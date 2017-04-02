@@ -46,6 +46,10 @@
   "camera": {
     "file_name": "www/img/camera.jpg",
     "vflip": true,
-    "hflip": false
+    "hflip": false,
+    "width": 1024,
+    "height": 768,
+    "quality": 75,
+    "show_timestamp": true
   }
 }

@@ -356,11 +356,11 @@ class CameraHandler(Resource):
         self.controller = controller
 
     def render(self, request):
-        # set the request content type
-        request.setHeader('Content-Type', 'application/json')
-
         # capture new image
         self.controller.camera.capture()
+
+        # set the request content type
+        request.setHeader('Content-Type', 'application/json')
 
         return json.dumps({'success': True})
 
@@ -369,12 +369,21 @@ class Camera:
     def __init__(self, config):
         self.camera = picamera.PiCamera()
         self.file_name = config['file_name']
+        self.width = config['width']
+        self.height = config['height']
+        self.show_ts = config['show_timestamp']
+
         self.camera.vflip = config['vflip']
         self.camera.hflip = config['hflip']
+        self.camera.resolution = (self.width, self.height)
+        self.camera.quality = config['quality']
 
     def capture(self):
             syslog.syslog("Capturing image...")
             syslog.syslog("Will save the image as:" + self.file_name)
+            if self.show_ts:
+                self.camera.annotate_text = datetime.now().isoformat()
+
             self.camera.capture(self.file_name)
 
 
