@@ -363,9 +363,9 @@ class CameraHandler(Resource):
         file_name = "www/img/camera_" + datetime.now().strftime("%Y-%m-%dT%H:%M:%S") + ".jpg"
         request.file_name = file_name
 
-        #request.notifyFinish()
+        request.notifyFinish()
 
-        return request
+        return
 
 
 class Camera:
