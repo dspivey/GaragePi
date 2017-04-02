@@ -386,7 +386,7 @@ class Camera:
             if self.show_timestamp:
                 self.camera.annotate_text = datetime.now().isoformat()
 
-            self.camera.capture(self.file_name, self.format, self.use_video_port, self.camera.resolution, 0, False, self.quality)
+            self.camera.capture(self.file_name, self.format, self.use_video_port, self.camera.resolution)
 
 
 def elapsed_time(seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=' '):
