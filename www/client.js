@@ -83,11 +83,11 @@ function pollCamera() {
             pollCamera.image.attr("src", "img/camera.jpg" + "?" + new Date().getTime());
             pollCamera.timestamp.text(response.last_timestamp);
 
-            setTimeout('pollCamera()', 15000);
+            setTimeout('pollCamera()', 30000);
         },
         // handle error
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            setTimeout('pollCamera()', 15000);
+            setTimeout('pollCamera()', 30000);
         }
     });
 }
