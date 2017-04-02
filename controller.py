@@ -117,9 +117,7 @@ class Controller:
         # camera configuration
         self.refresh_time = config['camera']['refresh_time_seconds']
         self.file_name = config['camera']['file_name']
-        syslog.syslog("Refresh Time:" + str(self.refresh_time))
-        syslog.syslog("File Name:" + self.file_name)
-        self.camera = Camera(self.refresh_time, self.file_name)
+        self.camera = Camera(self.file_name, self.refresh_time)
         self.camera.start()
 
     def status_check(self):
@@ -364,8 +362,9 @@ class Camera:
     def start(self):
         self.active = True
         while self.active:
-            syslog.syslog("Refresh Time:" + str(self.refresh_time_seconds))
-            syslog.syslog("File Name:" + self.file_name)
+            syslog.syslog("Starting camera...")
+            syslog.syslog("Will refresh image every " + str(self.refresh_time_seconds) + " seconds...")
+            syslog.syslog("Will save the image as:" + self.file_name)
             self.camera.capture(self.file_name)
             sleep(self.refresh_time_seconds)
 
