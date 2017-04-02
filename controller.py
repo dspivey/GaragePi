@@ -357,12 +357,12 @@ class CameraHandler(Resource):
 
     def render(self, request):
         # capture new image
-        self.controller.camera.capture()
+        timestamp = self.controller.camera.capture()
 
         # set the request content type
         request.setHeader('Content-Type', 'application/json')
 
-        return json.dumps({'success': True})
+        return json.dumps({'last_timestamp': timestamp})
 
 
 class Camera:
@@ -383,10 +383,14 @@ class Camera:
     def capture(self):
             syslog.syslog("Capturing image...")
             syslog.syslog("Will save the image as:" + self.file_name)
+            timestamp = datetime.now().isoformat()
+
             if self.show_timestamp:
-                self.camera.annotate_text = datetime.now().isoformat()
+                self.camera.annotate_text = timestamp
 
             self.camera.capture(self.file_name, self.format, self.use_video_port, self.camera.resolution)
+
+            return timestamp
 
 
 def elapsed_time(seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=' '):

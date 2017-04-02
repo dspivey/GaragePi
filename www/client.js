@@ -73,11 +73,15 @@ function poll() {
 }
 
 function pollCamera() {
+    if (!pollCamera.timestamp) pollCamera.timestamp = $("#timestamp");
+    if (!pollCamera.image) pollCamera.image = $("#cam-img");
+
     $.ajax({
         url: "cam",
         dataType: "json",
         success: function (response, status) {
-            $("#cam-img").attr("src", "img/camera.jpg" + "?" + new Date().getTime());
+            pollCamera.image.attr("src", "img/camera.jpg" + "?" + new Date().getTime());
+            pollCamera.timestamp.text(response.last_timestamp);
 
             setTimeout('pollCamera()', 15000);
         },
