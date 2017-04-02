@@ -74,7 +74,7 @@ function poll() {
 
 function pollCamera() {
     if (!pollCamera.timestamp) pollCamera.timestamp = $("#timestamp");
-    if (!pollCamera.image) pollCamera.image = $("#cam-img");
+    if (!pollCamera.image) pollCamera.image = $("#camera-image");
 
     $.ajax({
         url: "cam",
