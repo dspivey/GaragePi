@@ -2,7 +2,7 @@ var lastupdate = 0;
 
 function formatState(state, time) {
     var dateStr = dateFormat(new Date(parseInt(time) * 1000), "mmm dS, yyyy, h:MM TT");
-    return state.charAt(0).toUpperCase() + state.slice(1) + " as of " + dateStr;
+    return "Last updated: " + dateStr;
 }
 
 function click(name) {
@@ -27,7 +27,7 @@ function init() {
                 li = li + '<a href="javascript:click(\'' + id + '\');">';
                 li = li + '<img src="img/' + state + '.png" />';
                 li = li + '<h3>' + name + '</h3>';
-                //li = li + '<p>' + formatState(state, time) + '</p>';
+                li = li + '<p>' + formatState(state, time) + '</p>';
                 li = li + '</a></li>';
 
                 doorlist.append(li);
