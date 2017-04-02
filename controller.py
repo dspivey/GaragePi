@@ -365,7 +365,7 @@ class CameraHandler(Resource):
 
         #request.notifyFinish()
 
-        return server.NOT_DONE_YET
+        return request
 
 
 class Camera:
