@@ -27,7 +27,7 @@ function init() {
                 li = li + '<a href="javascript:click(\'' + id + '\');">';
                 li = li + '<img src="img/' + state + '.png" />';
                 li = li + '<h3>' + name + '</h3>';
-                li = li + '<p>' + formatState(state, time) + '</p>';
+                //li = li + '<p>' + formatState(state, time) + '</p>';
                 li = li + '</a></li>';
 
                 doorlist.append(li);
