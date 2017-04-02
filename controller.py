@@ -1,4 +1,4 @@
-# import RPi.GPIO as gpio
+import RPi.GPIO as gpio
 import json
 import smtplib
 import syslog
@@ -17,8 +17,6 @@ from twisted.web.guard import HTTPAuthSessionWrapper, BasicCredentialFactory
 from twisted.web.resource import Resource, IResource
 from twisted.web.static import File
 from zope.interface import implements
-from time import sleep
-
 
 class HttpPasswordRealm(object):
     implements(portal.IRealm)
@@ -48,20 +46,19 @@ class Door(object):
         self.time_to_open = config.get('time_to_open', 10)
         self.openhab_name = config.get('openhab_name')
         self.open_time = time.time()
-        #gpio.setup(self.relay_pin, gpio.OUT)
-        #gpio.setup(self.state_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
-        #gpio.output(self.relay_pin, True)
+        gpio.setup(self.relay_pin, gpio.OUT)
+        gpio.setup(self.state_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
+        gpio.output(self.relay_pin, True)
 
     def get_state(self):
-        #if gpio.input(self.state_pin) == self.state_pin_closed_value:
-        if True:
+        if gpio.input(self.state_pin) == self.state_pin_closed_value:
             return 'closed'
         elif self.last_action == 'open':
             if time.time() - self.last_action_time >= self.time_to_open:
                 return 'open'
             else:
                 return 'opening'
-        elif self.last_action ==  'close':
+        elif self.last_action == 'close':
             if time.time() - self.last_action_time >= self.time_to_close:
                 return 'open' # This state indicates a problem
             else:
@@ -71,7 +68,7 @@ class Door(object):
 
     def toggle_relay(self):
         state = self.get_state()
-        if (state == 'open'):
+        if state == 'open':
             self.last_action = 'close'
             self.last_action_time = time.time()
         elif state == 'closed':
@@ -81,16 +78,16 @@ class Door(object):
             self.last_action = None
             self.last_action_time = None
 
-        #gpio.output(self.relay_pin, False)
+        gpio.output(self.relay_pin, False)
         time.sleep(0.2)
-        #gpio.output(self.relay_pin, True)
+        gpio.output(self.relay_pin, True)
 
 
 class Controller:
     def __init__(self, config):
-        #gpio.setwarnings(False)
-        #gpio.cleanup()
-        #gpio.setmode(gpio.BCM)
+        gpio.setwarnings(False)
+        gpio.cleanup()
+        gpio.setmode(gpio.BCM)
         self.config = config
         self.doors = [Door(n, c) for (n, c) in config['doors'].items()]
         self.updateHandler = UpdateHandler(self)
