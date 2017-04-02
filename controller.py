@@ -369,22 +369,24 @@ class Camera:
     def __init__(self, config):
         self.camera = picamera.PiCamera()
         self.file_name = config['file_name']
+        self.format = config['format']
         self.width = config['width']
         self.height = config['height']
-        self.show_ts = config['show_timestamp']
+        self.show_timestamp = config['show_timestamp']
+        self.use_video_port = config['use_video_port']
+        self.quality = config['quality']
 
         self.camera.vflip = config['vflip']
         self.camera.hflip = config['hflip']
         self.camera.resolution = (self.width, self.height)
-        self.camera.quality = config['quality']
 
     def capture(self):
             syslog.syslog("Capturing image...")
             syslog.syslog("Will save the image as:" + self.file_name)
-            if self.show_ts:
+            if self.show_timestamp:
                 self.camera.annotate_text = datetime.now().isoformat()
 
-            self.camera.capture(self.file_name)
+            self.camera.capture(self.file_name, self.format, self.use_video_port, self.camera.resolution, 0, False, self.quality)
 
 
 def elapsed_time(seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=' '):
