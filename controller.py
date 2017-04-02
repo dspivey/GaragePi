@@ -363,6 +363,7 @@ class Camera:
     def capture(self):
             syslog.syslog("Capturing image...")
             syslog.syslog("Will save the image as:" + self.file_name)
+            sleep(2)
             self.camera.capture(self.file_name)
 
 
