@@ -353,16 +353,16 @@ class UpdateHandler(Resource):
 
 
 class Camera:
-    def __init__(self, filename, refresh):
+    def __init__(self, file_name, refresh):
         self.active = False
         self.camera = picamera.PiCamera()
-        self.file_name = filename
+        self.file_name = file_name
         self.refresh_time_seconds = refresh
 
     def start(self):
         self.active = True
         while self.active:
-            self.camera.capture(self.filename)
+            self.camera.capture(self.file_name)
             sleep(self.refresh_time_seconds)
 
     def stop(self):
