@@ -50,8 +50,8 @@
     "hflip": false,
     "show_timestamp": true,
     "use_video_port": true,
-    "width": 1024,
-    "height": 768,
+    "width": 640,
+    "height": 480,
     "quality": 75
   }
 }
