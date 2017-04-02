@@ -52,7 +52,7 @@ function poll(){
 				var time = response.update[i][2];
 
 				$("#" + id + " p").html(formatState(state, time));
-				$("#" + id  + " img").attr("src", "img/" + state + ".png")
+				$("#" + id  + " img").attr("src", "img/" + state + ".png");
 				$("#doorlist").listview('refresh');
 			}
 
