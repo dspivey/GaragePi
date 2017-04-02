@@ -361,11 +361,11 @@ class CameraHandler(Resource):
 
         # generate file name and add to return data
         file_name = "www/img/camera_" + datetime.now().strftime("%Y-%m-%dT%H:%M:%S") + ".jpg"
-        request.file_name = file_name
 
-        request.notifyFinish()
+        # capture new image
+        self.controller.camera.capture(file_name)
 
-        return ""
+        return json.dumps({'file_name': file_name})
 
 
 class Camera:
