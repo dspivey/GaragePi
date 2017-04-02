@@ -118,7 +118,7 @@ class Controller:
         self.refresh_time = config['camera']['refresh_time_seconds']
         self.file_name = config['camera']['file_name']
         self.camera = Camera(self.file_name, self.refresh_time)
-        self.camera.start()
+        self.camera.capture()
 
     def status_check(self):
         for door in self.doors:
@@ -217,6 +217,10 @@ class Controller:
                 return
 
     def get_updates(self, lastupdate):
+        # capture new image
+        self.camera.capture()
+
+        # update door information
         updates = []
         for d in self.doors:
             if d.last_state_time >= lastupdate:
@@ -232,7 +236,7 @@ class Controller:
 
         if self.config['config']['use_auth']:
             clk = ClickHandler(self)
-            args = {self.config['site']['username']:self.config['site']['password']}
+            args = {self.config['site']['username']: self.config['site']['password']}
             checker = checkers.InMemoryUsernamePasswordDatabaseDontUse(**args)
             realm = HttpPasswordRealm(clk)
             p = portal.Portal(realm, [checker])
@@ -245,12 +249,6 @@ class Controller:
         site = server.Site(root)
         reactor.listenTCP(self.config['site']['port'], site)  # @UndefinedVariable
         reactor.run()  # @UndefinedVariable
-
-    def start_camera(self):
-        self.camera.start()
-
-    def stop_camera(self):
-        self.camera.stop()
 
 
 class ClickHandler(Resource):
@@ -296,6 +294,7 @@ class ConfigHandler(Resource):
 
 class UpdateHandler(Resource):
     isLeaf = True
+
     def __init__(self, controller):
         Resource.__init__(self)
         self.delayed_requests = []
@@ -304,9 +303,9 @@ class UpdateHandler(Resource):
     def handle_updates(self):
         for request in self.delayed_requests:
             updates = self.controller.get_updates(request.lastupdate)
-            if updates != []:
+            if updates:
                 self.send_updates(request, updates)
-                self.delayed_requests.remove(request);
+                self.delayed_requests.remove(request)
 
     def format_updates(self, request, update):
         response = json.dumps({'timestamp': int(time.time()), 'update':update})
@@ -354,22 +353,14 @@ class UpdateHandler(Resource):
 
 class Camera:
     def __init__(self, file_name, refresh):
-        self.active = False
         self.camera = picamera.PiCamera()
         self.file_name = file_name
         self.refresh_time_seconds = refresh
 
-    def start(self):
-        self.active = True
-        while self.active:
-            syslog.syslog("Starting camera...")
-            syslog.syslog("Will refresh image every " + str(self.refresh_time_seconds) + " seconds...")
+    def capture(self):
+            syslog.syslog("Capturing image...")
             syslog.syslog("Will save the image as:" + self.file_name)
             self.camera.capture(self.file_name)
-            sleep(self.refresh_time_seconds)
-
-    def stop(self):
-        self.active = False
 
 
 def elapsed_time(seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=' '):
