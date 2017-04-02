@@ -118,7 +118,6 @@ class Controller:
 
         # camera configuration
         self.camera = Camera(config['camera'])
-        self.camera.capture()
 
     def status_check(self):
         for door in self.doors:
