@@ -360,18 +360,20 @@ class CameraHandler(Resource):
         request.setHeader('Content-Type', 'application/json')
 
         # generate file name and add to return data
-        file_name = "img/camera_" + datetime.now().strftime("%Y-%m-%dT%H:%M:%S") + ".jpg"
+        timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        local_file_name = "www/img/camera_" + timestamp + ".jpg"
+        web_file_name = "img/camera_" + timestamp + ".jpg"
 
         # capture new image
-        self.controller.camera.capture(file_name)
+        self.controller.camera.capture(local_file_name)
 
-        return json.dumps({'file_name': file_name})
+        return json.dumps({'file_name': web_file_name})
 
 
 class Camera:
     def __init__(self, config):
         self.camera = picamera.PiCamera()
-        self.file_name = config['file_name']
+        #self.file_name = config['file_name']
         self.camera.vflip = config['vflip']
         self.camera.hflip = config['hflip']
 
