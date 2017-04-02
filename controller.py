@@ -115,10 +115,11 @@ class Controller:
             syslog.syslog("No alerts configured")
 
         # camera configuration
-        self.refresh_time = config['camera']['refresh_time_seconds']
-        self.file_name = config['camera']['file_name']
-        self.camera = Camera(self.file_name, self.refresh_time)
-        self.camera.capture()
+        #self.refresh_time = config['camera']['refresh_time_seconds']
+        #self.file_name = config['camera']['file_name']
+        #self.vflip = config['camera']['vflip']
+        #self.hflip = config['camera']['hflip']
+        self.camera = Camera(config['camera'])
 
     def status_check(self):
         for door in self.doors:
@@ -352,10 +353,12 @@ class UpdateHandler(Resource):
 
 
 class Camera:
-    def __init__(self, file_name, refresh):
+    def __init__(self, config):
         self.camera = picamera.PiCamera()
-        self.file_name = file_name
-        self.refresh_time_seconds = refresh
+        self.file_name = config['file_name']
+        self.vflip = config['vflip']
+        self.hflip = config['hflip']
+        self.camera.vflip = self.vflip
 
     def capture(self):
             syslog.syslog("Capturing image...")

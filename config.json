@@ -44,7 +44,8 @@
     }
   },
   "camera": {
-    "refresh_time_seconds": 5,
-    "file_name": "www/img/camera.jpg"
+    "file_name": "www/img/camera.jpg",
+    "vflip": true,
+    "hflip": false
   }
 }
