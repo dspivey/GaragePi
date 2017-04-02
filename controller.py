@@ -1,19 +1,22 @@
-import time, syslog, uuid
-import smtplib
-#import RPi.GPIO as gpio
+# import RPi.GPIO as gpio
 import json
-import httplib
+import smtplib
+import syslog
+import time
 import urllib
-
-from twisted.internet import task
-from twisted.internet import reactor
-from twisted.web import server
-from twisted.web.static import File
-from twisted.web.resource import Resource, IResource
-from zope.interface import implements
+import httplib
+import picamera
 
 from twisted.cred import checkers, portal
+from twisted.internet import reactor
+from twisted.internet import task
+from twisted.web import server
 from twisted.web.guard import HTTPAuthSessionWrapper, BasicCredentialFactory
+from twisted.web.resource import Resource, IResource
+from twisted.web.static import File
+from zope.interface import implements
+from time import sleep
+
 
 class HttpPasswordRealm(object):
     implements(portal.IRealm)
@@ -25,6 +28,7 @@ class HttpPasswordRealm(object):
         if IResource in interfaces:
             return (IResource, self.myresource, lambda: None)
         raise NotImplementedError()
+
 
 class Door(object):
     last_action = None
@@ -79,13 +83,14 @@ class Door(object):
         time.sleep(0.2)
         #gpio.output(self.relay_pin, True)
 
-class Controller():
+
+class Controller:
     def __init__(self, config):
         #gpio.setwarnings(False)
         #gpio.cleanup()
         #gpio.setmode(gpio.BCM)
         self.config = config
-        self.doors = [Door(n,c) for (n,c) in config['doors'].items()]
+        self.doors = [Door(n, c) for (n, c) in config['doors'].items()]
         self.updateHandler = UpdateHandler(self)
         for door in self.doors:
             door.last_state = 'unknown'
@@ -108,6 +113,12 @@ class Controller():
         else:
             self.alert_type = None
             syslog.syslog("No alerts configured")
+
+        # camera configuration
+        self.refresh_time = config['camera']['refresh_time_seconds']
+        self.file_name = config['camera']['file_name']
+        self.camera = Camera(self.refresh_time, self.file_name)
+        self.camera.start()
 
     def status_check(self):
         for door in self.doors:
@@ -177,6 +188,7 @@ class Controller():
                  "body": message,
              }), {'Authorization': 'Bearer ' + config['access_token'], 'Content-Type': 'application/json'})
         door.pb_iden = json.loads(conn.getresponse().read())['iden']
+
     def send_pushover(self, door, title, message):
         syslog.syslog("Sending Pushover message")
         config = self.config['alerts']['pushover']
@@ -220,23 +232,31 @@ class Controller():
 
         if self.config['config']['use_auth']:
             clk = ClickHandler(self)
-            args={self.config['site']['username']:self.config['site']['password']}
+            args = {self.config['site']['username']:self.config['site']['password']}
             checker = checkers.InMemoryUsernamePasswordDatabaseDontUse(**args)
             realm = HttpPasswordRealm(clk)
             p = portal.Portal(realm, [checker])
-            credentialFactory = BasicCredentialFactory("Garage Door Controller")
-            protected_resource = HTTPAuthSessionWrapper(p, [credentialFactory])
+            credential_factory = BasicCredentialFactory("Garage Door Controller")
+            protected_resource = HTTPAuthSessionWrapper(p, [credential_factory])
             root.putChild('clk', protected_resource)
         else:
             root.putChild('clk', ClickHandler(self))
+
         site = server.Site(root)
         reactor.listenTCP(self.config['site']['port'], site)  # @UndefinedVariable
         reactor.run()  # @UndefinedVariable
 
+    def start_camera(self):
+        self.camera.start()
+
+    def stop_camera(self):
+        self.camera.stop()
+
+
 class ClickHandler(Resource):
     isLeaf = True
 
-    def __init__ (self, controller):
+    def __init__(self, controller):
         Resource.__init__(self)
         self.controller = controller
 
@@ -244,6 +264,7 @@ class ClickHandler(Resource):
         door = request.args['id'][0]
         self.controller.toggle(door)
         return 'OK'
+
 
 class StatusHandler(Resource):
     isLeaf = True
@@ -258,6 +279,7 @@ class StatusHandler(Resource):
             if (d.id == door):
                 return d.last_state
         return ''
+
 
 class ConfigHandler(Resource):
     isLeaf = True
@@ -328,6 +350,23 @@ class UpdateHandler(Resource):
 
         # tell the client we're not done yet
         return server.NOT_DONE_YET
+
+
+class Camera:
+    def __init__(self, filename, refresh):
+        self.active = False
+        self.camera = picamera.PiCamera()
+        self.file_name = filename
+        self.refresh_time_seconds = refresh
+
+    def start(self):
+        self.active = True
+        while self.active:
+            self.camera.capture(self.filename)
+            sleep(self.refresh_time_seconds)
+
+    def stop(self):
+        self.active = False
 
 def elapsed_time(seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=' '):
     """

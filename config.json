@@ -42,5 +42,9 @@
       "approx_time_to_open": 15,
       "openhab_name": "g_door_left"
     }
+  },
+  "camera": {
+    "refresh_time_seconds": 5,
+    "file_name": "www/img/camera.jpg"
   }
 }
