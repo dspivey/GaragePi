@@ -4,6 +4,8 @@ import smtplib
 import syslog
 import time
 import urllib
+from datetime import datetime
+
 import httplib
 import picamera
 
@@ -215,9 +217,6 @@ class Controller:
                 return
 
     def get_updates(self, lastupdate):
-        # capture new image
-        #self.camera.capture()
-
         # update door information
         updates = []
         for d in self.doors:
@@ -231,6 +230,7 @@ class Controller:
         root.putChild('st', StatusHandler(self))
         root.putChild('upd', self.updateHandler)
         root.putChild('cfg', ConfigHandler(self))
+        root.putChild('cam', CameraHandler(self))
 
         if self.config['config']['use_auth']:
             clk = ClickHandler(self)
@@ -338,7 +338,7 @@ class UpdateHandler(Resource):
 
         # Can we accommodate this request now?
         updates = self.controller.get_updates(request.lastupdate)
-        if updates != []:
+        if updates:
             return self.format_updates(request, updates)
 
 
@@ -349,6 +349,20 @@ class UpdateHandler(Resource):
         return server.NOT_DONE_YET
 
 
+class CameraHandler(Resource):
+    def render(self, request):
+        # set the request content type
+        request.setHeader('Content-Type', 'application/json')
+
+        # generate file name and add to return data
+        file_name = "www/img/camera_" + datetime.isoformat() + ".jpg"
+        request.file_name = file_name
+
+        #request.notifyFinish()
+
+        return server.NOT_DONE_YET
+
+
 class Camera:
     def __init__(self, config):
         self.camera = picamera.PiCamera()
@@ -356,11 +370,10 @@ class Camera:
         self.camera.vflip = config['vflip']
         self.camera.hflip = config['hflip']
 
-    def capture(self):
+    def capture(self, file_name):
             syslog.syslog("Capturing image...")
-            syslog.syslog("Will save the image as:" + self.file_name)
-            sleep(5)
-            self.camera.capture(self.file_name)
+            syslog.syslog("Will save the image as:" + file_name)
+            self.camera.capture(file_name)
 
 
 def elapsed_time(seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=' '):
