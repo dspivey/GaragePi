@@ -359,28 +359,23 @@ class CameraHandler(Resource):
         # set the request content type
         request.setHeader('Content-Type', 'application/json')
 
-        # generate file name and add to return data
-        timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-        local_file_name = "www/img/camera_" + timestamp + ".jpg"
-        web_file_name = "img/camera_" + timestamp + ".jpg"
-
         # capture new image
-        self.controller.camera.capture(local_file_name)
+        self.controller.camera.capture()
 
-        return json.dumps({'file_name': web_file_name})
+        return json.dumps({'success': True})
 
 
 class Camera:
     def __init__(self, config):
         self.camera = picamera.PiCamera()
-        #self.file_name = config['file_name']
+        self.file_name = config['file_name']
         self.camera.vflip = config['vflip']
         self.camera.hflip = config['hflip']
 
-    def capture(self, file_name):
+    def capture(self):
             syslog.syslog("Capturing image...")
-            syslog.syslog("Will save the image as:" + file_name)
-            self.camera.capture(file_name)
+            syslog.syslog("Will save the image as:" + self.file_name)
+            self.camera.capture(self.file_name)
 
 
 def elapsed_time(seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=' '):

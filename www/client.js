@@ -77,7 +77,7 @@ function pollCamera() {
         url: "cam",
         dataType: "json",
         success: function (response, status) {
-            $("#cam-img").attr("src", response.file_name);
+            $("#cam-img").attr("src", "img/camera.jpg" + "?" + new Date().getTime());
 
             setTimeout('pollCamera()', 5000);
         },
