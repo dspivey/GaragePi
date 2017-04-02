@@ -360,7 +360,7 @@ class CameraHandler(Resource):
         request.setHeader('Content-Type', 'application/json')
 
         # generate file name and add to return data
-        file_name = "www/img/camera_" + datetime.isoformat() + ".jpg"
+        file_name = "www/img/camera_" + datetime.now().strftime("%Y-%m-%dT%H:%M:%S") + ".jpg"
         request.file_name = file_name
 
         #request.notifyFinish()
