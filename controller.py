@@ -365,7 +365,7 @@ class CameraHandler(Resource):
 
         request.notifyFinish()
 
-        return
+        return ""
 
 
 class Camera:
