@@ -115,11 +115,8 @@ class Controller:
             syslog.syslog("No alerts configured")
 
         # camera configuration
-        #self.refresh_time = config['camera']['refresh_time_seconds']
-        #self.file_name = config['camera']['file_name']
-        #self.vflip = config['camera']['vflip']
-        #self.hflip = config['camera']['hflip']
         self.camera = Camera(config['camera'])
+        self.camera.capture()
 
     def status_check(self):
         for door in self.doors:
@@ -219,7 +216,7 @@ class Controller:
 
     def get_updates(self, lastupdate):
         # capture new image
-        self.camera.capture()
+        #self.camera.capture()
 
         # update door information
         updates = []
@@ -356,9 +353,8 @@ class Camera:
     def __init__(self, config):
         self.camera = picamera.PiCamera()
         self.file_name = config['file_name']
-        self.vflip = config['vflip']
-        self.hflip = config['hflip']
-        self.camera.vflip = self.vflip
+        self.camera.vflip = config['vflip']
+        self.camera.hflip = config['hflip']
 
     def capture(self):
             syslog.syslog("Capturing image...")
